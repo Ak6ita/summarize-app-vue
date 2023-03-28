@@ -53,7 +53,7 @@ export default {
       inputText: "",
       summary: "",
       isLoading: false,
-      apiKey: "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",
+      apiKey: "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",
       model: "text-davinci-002",
       temperature: 0.5,
       maxTokens: 60,
