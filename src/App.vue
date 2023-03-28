@@ -19,19 +19,26 @@
           </div>
         </div>
         <div class="col-md-4">
-          <b-card>
-            <template #header>Summary</template>
+          <b-card
+            header-bg-variant="primary"
+            header-text-variant="white"
+            header-class="custom-card-header"
+          >
+            <template v-slot:header>Summary</template>
             <b-card-text>
-              <p v-if="!summary">
+              <p v-if="!isLoading && !summary">
                 Enter your text and click Summarize to see the summary.
               </p>
               <p v-if="summary">{{ summary.join(" ") }}</p>
+              <b-button-group class="mb-2">
+                <b-button variant="secondary" @click="downloadSummary">
+                  Download Summary
+                </b-button>
+              </b-button-group>
+              <div v-if="isLoading" class="text-center">
+                <div class="spinner"></div>
+              </div>
             </b-card-text>
-            <b-button-group class="mb-2">
-              <b-button variant="secondary" @click="downloadSummary"
-                >Download Summary</b-button
-              >
-            </b-button-group>
           </b-card>
         </div>
       </div>
@@ -45,7 +52,8 @@ export default {
     return {
       inputText: "",
       summary: "",
-      apiKey: "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",
+      isLoading: false,
+      apiKey: "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",
       model: "text-davinci-002",
       temperature: 0.5,
       maxTokens: 60,
@@ -54,6 +62,9 @@ export default {
   },
   methods: {
     async summarizeText() {
+      if (this.isLoading) {
+        return;
+      }
       let headers = new Headers({
         "Content-Type": "application/json",
         Authorization: `Bearer ${this.apiKey}`,
@@ -73,7 +84,7 @@ export default {
         headers,
         body,
       };
-
+      this.isLoading = true;
       try {
         const response = await fetch(
           "https://api.openai.com/v1/completions",
@@ -82,6 +93,7 @@ export default {
         let data = await response.json();
         let summary = data.choices[0].text.split(". ");
         this.summary = summary;
+        this.isLoading = false;
       } catch (error) {
         console.log(error);
       }
@@ -121,11 +133,8 @@ body {
   margin-bottom: 32px;
 }
 
-.card-header {
-  background-color: #007bff;
-  color: #fff;
+.custom-card-header {
   font-size: 18px;
-  font-weight: bold;
 }
 
 .card-text {
@@ -151,6 +160,20 @@ label {
 .btn-secondary {
   font-size: 16px;
   padding: 8px 16px;
+}
+.spinner {
+  display: inline-block;
+  width: 30px;
+  height: 30px;
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  border-left-color: #7986cb;
+  border-radius: 50%;
+  animation: spin 1s ease infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 </style>
 
