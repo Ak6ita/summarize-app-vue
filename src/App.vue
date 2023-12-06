@@ -53,8 +53,8 @@ export default {
       inputText: "",
       summary: "",
       isLoading: false,
-      apiKey: "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",
-      model: "text-davinci-002",
+      apiKey: "",
+      model: "gpt-3.5-turbo-instruct",
       temperature: 0.5,
       maxTokens: 60,
       topP: 1,
@@ -111,6 +111,13 @@ export default {
       link.download = "summary.txt";
       link.click();
     },
+  },
+  async beforeCreate() {
+    let tokenResponse = await fetch(
+      "https://tamaraj.pythonanywhere.com/openai-token"
+    );
+    tokenResponse = await tokenResponse.json();
+    this.apiKey = tokenResponse.key;
   },
 };
 </script>
